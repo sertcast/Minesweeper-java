@@ -1,5 +1,8 @@
 import java.awt.*;
 
+/**
+ *
+ */
 public class Cell {
     private int col, row, x, y, size, num = 0, txtX, txtY;
     private boolean mine, revealed, initialized = false;
