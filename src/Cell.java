@@ -5,7 +5,7 @@ import java.awt.*;
  */
 public class Cell {
     private int col, row, x, y, size, num = 0, txtX, txtY;
-    private boolean mine, revealed, initialized = false;
+    private boolean mine, revealed, initialized = false, flagged = false;
 
     public Cell(int col, int row, int size) {
         this.x = col * size;
@@ -32,14 +32,17 @@ public class Cell {
             g.setColor(Color.red);
             g.fillRect(x, y, size, size);
         } else if (revealed) {
-
             g.setColor(Color.lightGray);
             g.fillRect(x, y, size, size);
             if (num != 0) {
                 g.setColor(Color.black);
                 g.drawString("" + num, txtX, txtY);
             }
-
+        } else if (flagged) {
+            g.setColor(Color.lightGray);
+            g.fillRect(x, y, size, size);
+            g.setColor(Color.green);
+            g.fillRect(x + 5, y + 5, size - 10, size - 10);
         }
         g.setColor(Color.black);
         g.drawRect(x, y, size, size);
@@ -72,7 +75,16 @@ public class Cell {
         return this.num;
     }
 
+    /**
+     * reveals the cell
+     *
+     * @param field the whole field
+     * @return boolean true if game is over, meaning that a mine is being revealed
+     */
     public boolean reveal(Cell[][] field) {
+        if (flagged) {
+            return false;
+        }
 
         if (this.mine) {
             this.revealed = true;
@@ -82,7 +94,7 @@ public class Cell {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     try {
-                        if (  !field[row + i][col + j].revealed)
+                        if (!field[row + i][col + j].revealed)
                             field[row + i][col + j].reveal(field);
                     } catch (ArrayIndexOutOfBoundsException e) {
 
@@ -97,4 +109,12 @@ public class Cell {
         return false;
     }
 
+    public boolean isFlagged() {
+        return this.flagged;
+    }
+
+    public void flag() {
+        if (!revealed)
+            this.flagged = !this.flagged;
+    }
 }

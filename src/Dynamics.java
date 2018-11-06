@@ -8,8 +8,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
 
 /**
  * Dynamics.java
@@ -25,8 +24,9 @@ public class Dynamics extends JPanel implements MouseListener,
     private Timer tm = new Timer(5, this);
     private Cell field[][];
     private int frameW, frameH, cellSize;
-    private int numMines = 20;
-    private boolean gameOver = false;
+    private int numMines = 10;
+    private int numFlags = numMines;
+    private boolean lost = false, won = false;
 
     public Dynamics(int frameW, int frameH) {
         this.addKeyListener(this);
@@ -54,10 +54,15 @@ public class Dynamics extends JPanel implements MouseListener,
             }
         }
         tm.start();
-        if (gameOver) {
+        if (lost) {
             g.setColor(Color.WHITE);
             g.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
             g.drawString("Game Over", 100, 100);
+            tm.stop();
+        } else if (won) {
+            g.setColor(Color.GREEN);
+            g.setFont(new Font("Comic Sans MS", Font.BOLD, 36));
+            g.drawString("CONGRATS! YOU WON!", 100, 100);
             tm.stop();
         }
 
@@ -125,6 +130,8 @@ public class Dynamics extends JPanel implements MouseListener,
             }
             System.out.println();
         }
+        System.out.println();
+
     }
 
     /**
@@ -138,30 +145,66 @@ public class Dynamics extends JPanel implements MouseListener,
         }
     }
 
-    /**
-     * the method is called when the mouse is pressed
-     *
-     * @param e
-     */
     public void mousePressed(MouseEvent e) {
-        if (!gameOver) {
-            //reveals the clicked cell, if the cell contains a mine, gameOver will equal to false
+        if (!lost && SwingUtilities.isLeftMouseButton(e)) {
+            int xIndex = e.getX() / this.cellSize;
+            int yIndex = e.getY() / this.cellSize;
+            //reveals the clicked cell, if the cell contains a mine, lost will equal to false
             try {
-                gameOver = field[e.getY() / this.cellSize][e.getX()
-                        / this.cellSize].reveal(field);
+                lost = field[yIndex][xIndex].reveal(field);
             } catch (ArrayIndexOutOfBoundsException ex) {
-                gameOver = field[field.length - 1][field.length - 1]
-                        .reveal(field);
+                if (xIndex == field.length && yIndex == field.length) {
+                    lost = field[xIndex - 1][yIndex - 1]
+                            .reveal(field);
+                }
+            }
+        } else if (!lost && SwingUtilities.isRightMouseButton(e)) {
+            int xIndex = e.getX() / this.cellSize;
+            int yIndex = e.getY() / this.cellSize;
+            //reveals the clicked cell, if the cell contains a mine, lost will equal to false
+            try {
+                if (field[yIndex][xIndex].isFlagged()) {
+                    numFlags++;
+                } else {
+                    numFlags--;
+                }
+                field[yIndex][xIndex].flag();
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                if (xIndex == field.length && yIndex == field.length) {
+                    if (field[yIndex - 1][xIndex - 1].isFlagged()) {
+                        numFlags++;
+                    } else {
+                        numFlags--;
+                    }
+                    field[yIndex - 1][xIndex - 1].flag();
+                }
             }
         }
-        if (gameOver)
+        if (numFlags == 0) {
+            boolean winCheck = true;
+            for (Cell[] row : field) {
+                for (Cell cell : row) {
+                    if (cell.isMine() && !cell.isFlagged()) {
+                        winCheck = false;
+                        break;
+                    }
+                }
+                if (!winCheck)
+                    break;
+            }
+            won = winCheck;
+        }
+
+        if (lost || won)
             revealAll();
+
     }
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == 'R') {
             init();
-            gameOver = false;
+            lost = false;
+            won = false;
             repaint();
         }
     }
