@@ -1,14 +1,6 @@
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Dynamics.java
@@ -16,7 +8,7 @@ import javax.swing.*;
  * Description:
  *
  * @author Mert Kaya
- * @version 1.0.1(created : Nov 2, 2018, updated : Nov 3, 2018)
+ * @version 1.0.1(created : Nov 2, 2018, updated : Nov 6, 2018)
  */
 public class Dynamics extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener, ActionListener {
@@ -165,18 +157,21 @@ public class Dynamics extends JPanel implements MouseListener,
             try {
                 if (field[yIndex][xIndex].isFlagged()) {
                     numFlags++;
-                } else {
+                    field[yIndex][xIndex].flag();
+                } else if (numFlags != 0) {
                     numFlags--;
+                    field[yIndex][xIndex].flag();
                 }
-                field[yIndex][xIndex].flag();
             } catch (ArrayIndexOutOfBoundsException ex) {
                 if (xIndex == field.length && yIndex == field.length) {
                     if (field[yIndex - 1][xIndex - 1].isFlagged()) {
                         numFlags++;
-                    } else {
+                        field[yIndex - 1][xIndex - 1].flag();
+                    } else if (numFlags != 0) {
                         numFlags--;
+                        field[yIndex - 1][xIndex - 1].flag();
                     }
-                    field[yIndex - 1][xIndex - 1].flag();
+
                 }
             }
         }
@@ -205,6 +200,7 @@ public class Dynamics extends JPanel implements MouseListener,
             init();
             lost = false;
             won = false;
+            numFlags = numMines;
             repaint();
         }
     }
