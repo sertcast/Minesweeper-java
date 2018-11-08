@@ -51,7 +51,7 @@ public class Cell {
     }
 
     private void setTextPos(Graphics g) {
-        g.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+        g.setFont(new Font("Comic Sans MS", Font.BOLD, this.size * 1 / 2));
         this.txtX = this.x
                 + (this.size - g.getFontMetrics().stringWidth("" + num)) / 2;
         this.txtY = this.y + ((this.size - g.getFontMetrics().getHeight()) / 2)
@@ -114,7 +114,10 @@ public class Cell {
     }
 
     public void flag() {
-        if (!revealed)
-            this.flagged = !this.flagged;
+        this.flagged = !this.flagged;
+    }
+
+    public boolean isRevealed() {
+        return this.revealed;
     }
 }

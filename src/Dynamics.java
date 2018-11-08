@@ -8,7 +8,7 @@ import java.awt.event.*;
  * Description:
  *
  * @author Mert Kaya
- * @version 1.0.1(created : Nov 2, 2018, updated : Nov 6, 2018)
+ * @version 1.0.1(created : Nov 2, 2018, updated : Nov 7, 2018)
  */
 public class Dynamics extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener, ActionListener {
@@ -16,6 +16,7 @@ public class Dynamics extends JPanel implements MouseListener,
     private Timer tm = new Timer(5, this);
     private Cell field[][];
     private int frameW, frameH, cellSize;
+    private int numOfColumns = 20;
     private int numMines = 10;
     private int numFlags = numMines;
     private boolean lost = false, won = false;
@@ -29,7 +30,7 @@ public class Dynamics extends JPanel implements MouseListener,
 
         this.frameH = frameH;
         this.frameW = frameW;
-        this.cellSize = frameW / 10;
+        this.cellSize = frameW / numOfColumns;
         this.field = new Cell[frameH / cellSize][frameW / cellSize];
 
         this.init();
@@ -158,7 +159,7 @@ public class Dynamics extends JPanel implements MouseListener,
                 if (field[yIndex][xIndex].isFlagged()) {
                     numFlags++;
                     field[yIndex][xIndex].flag();
-                } else if (numFlags != 0) {
+                } else if (numFlags != 0 && !field[yIndex][xIndex].isRevealed()) {
                     numFlags--;
                     field[yIndex][xIndex].flag();
                 }
@@ -167,7 +168,7 @@ public class Dynamics extends JPanel implements MouseListener,
                     if (field[yIndex - 1][xIndex - 1].isFlagged()) {
                         numFlags++;
                         field[yIndex - 1][xIndex - 1].flag();
-                    } else if (numFlags != 0) {
+                    } else if (numFlags != 0 && !field[yIndex][xIndex].isRevealed()) {
                         numFlags--;
                         field[yIndex - 1][xIndex - 1].flag();
                     }
